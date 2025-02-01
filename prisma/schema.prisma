@@ -6,10 +6,46 @@
 
 generator client {
   provider = "prisma-client-js"
-   output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = "postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public"
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Usuario {
+  ID_Usuario    Int    @id @default(autoincrement())
+  nome    String
+  email   String    @unique
+  senha   String 
+  foto    String?
+  admin    Boolean @default(false)
+  musicas    Usuarios_Musicas[]
+}
+
+model Artista{
+  ID_Artista   Int    @id @default(autoincrement())
+  nome    String
+  foto    String?
+  numero_streams    Int?
+  musicas    Musica[]
+}
+
+model Musica{
+  ID_Musica    Int    @id @default(autoincrement())
+  nome    String
+  genero    String
+  album    String?
+  ID_Artista    Int
+  artista    Artista    @relation(fields: [ID_Artista], references: [ID_Artista])
+  usuario Usuarios_Musicas[]
+}
+
+model Usuarios_Musicas{
+  ID_Usuario    Int
+  ID_Musica    Int
+  usuario    Usuario @relation(fields:[ID_Usuario], references: [ID_Usuario])
+  musica    Musica @relation(fields:[ID_Musica], references: [ID_Musica])
+
+  @@id([ID_Usuario, ID_Musica])
 }
