@@ -1,25 +1,23 @@
-import prisma from "../../../../database/prismaClient";
+import { PrismaClient } from "@prisma/client";
 
-export class ArtistService {
-    // Criar um novo artista
-    async create(data: { nome: string; foto?: string; numero_streams: number }) {
-     return prisma.artistas.create({
-    data,
+const prisma = new PrismaClient();
+
+class ArtistService {
+  //Método para criar um novo artista
+  async createArtist(nome: string, foto?: string, numero_streams?: number) {
+    return prisma.artista.create({
+      data: { nome, foto, numero_streams },
     });
-    }
-  
-    // Obter todos os artistas
-    async findAll() {
-      return prisma.artistas.findMany();
-    }
-  
-    // Encontrar um artista pelo ID
-    async findById(id: number) {
-      return prisma.artistas.findUnique({
-        where: { ID_Artista: id },
-      });
+  }
+//Método para buscar um artista pelo ID
+  async getArtistById(id: number) {
+    return prisma.artista.findUnique({ 
+      where: { ID_Artista: id }, 
+      include: { musicas: true }
+    });
+  }
+//Método para buscar todos os artistas cadastrados
+  async getAllArtists() {
+    return prisma.artista.findMany();
+  }
 }
-// Atualizar os dados de um artista
-// Deletar um artista pelo ID
-}
-

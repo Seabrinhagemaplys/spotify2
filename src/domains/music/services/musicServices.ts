@@ -1,23 +1,24 @@
-import prisma from "../../../../database/prismaClient";
-export class MusicService {
-    // Criar uma nova música
-    async create(data: { nome: string; genero: string; album?: string; ID_Artista: number }) {
-      return prisma.musicas.create({
-        data,
-      });
-    }
-  
-    // Obter todas as músicas
-    async findAll() {
-      return prisma.musicas.findMany();
-    }
-  
-    // Encontrar uma música pelo ID
-    async findById(id: number) {
-      return prisma.musicas.findUnique({
-        where: { ID_Musica: id },
-      });
-    }
-    //Atualizar os dados de uma música
-    //Deletar uma música pelo ID
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+class MusicService {
+   // Método para criar uma nova música
+  async createMusic(nome: string, genero: string, ID_Artista: number, album?: string) {
+    return prisma.musica.create({
+      data: { nome, genero, album, ID_Artista },
+    });
+  }
+  // Método para buscar uma música pelo ID
+  async getMusicById(id: number) {
+    return prisma.musica.findUnique({ 
+      where: { ID_Musica: id }, 
+      include: { artista: true }
+    });
+  }
+// Método para buscar todas as músicas cadastradas
+  async getAllMusic() {
+    return prisma.musica.findMany();
+  }
+   
 }
