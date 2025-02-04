@@ -14,7 +14,8 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) =>{
 
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 	try{
-		const user = await userService.getUserById(Number(req.params.id));
+		const { id } = req.params;
+		const user = await userService.getUserById(Number(id));
 		res.json(user);
 	} catch(error){
 		next(error);
@@ -25,10 +26,23 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const { nome, email, senha, admin, foto} = req.body;
 		const user = await userService.createUser(nome, email, senha, admin, foto);
-		res.json(user);
+		res.json({ message: "Usuario criado com sucesso!", user: user});
 	} catch(error){
 		next(error);
 	}
 });
+
+router.put("/:email", async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const { email } = req.params;
+		const body = req.body;
+		const user = await userService.updateUser(email, body);
+		res.json({ message: "Usuario atualizado com sucesso!", user: user});	
+	} catch (error) {
+		next(error);
+	}
+});
+
+
 
 export default router;
