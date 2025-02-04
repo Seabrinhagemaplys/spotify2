@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { Artista } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -21,7 +22,7 @@ class ArtistService {
 		return prisma.artista.findMany();
 	}
 
-	async updateArtista(id: number, body: any) {
+	async updateArtista(id: number, body: Partial<Artista>) {
 		try {
 			const artistaFound = await prisma.artista.findUnique({
 				where: { ID_Artista: id },
@@ -59,3 +60,5 @@ class ArtistService {
 		}
 	}
 }
+
+export default new ArtistService();
