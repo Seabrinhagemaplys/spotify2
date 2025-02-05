@@ -22,17 +22,17 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
-router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/create", async (req: Request, res: Response, next: NextFunction) => {
 	try{
-		const { nome, email, senha, admin, foto} = req.body;
-		const user = await userService.createUser(nome, email, senha, admin, foto);
+		//const { nome, email, senha, admin, foto} = req.body;
+		const user = await userService.createUser(req.body);
 		res.json({ message: "Usuario criado com sucesso!", user: user});
 	} catch(error){
 		next(error);
 	}
 });
 
-router.put("/:email", async (req: Request, res: Response, next: NextFunction) => {
+router.put("/update/:email", async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { email } = req.params;
 		const body = req.body;
@@ -43,7 +43,7 @@ router.put("/:email", async (req: Request, res: Response, next: NextFunction) =>
 	}
 });
 
-router.delete("/:email", async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/delete/:email", async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { email } = req.params;
 		await userService.deleteUser(email);

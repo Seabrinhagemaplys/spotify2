@@ -5,16 +5,17 @@ const prisma = new PrismaClient();
 // Usuário Service
 class UserService {
 	// Método para criar um novo usuário
-	async createUser(
-		nome: string,
-		email: string,
-		senha: string,
-		admin: boolean = false,
-		foto?: string
-	) {
-		return prisma.usuario.create({
-			data: { nome, email, senha, admin, foto },
+	async createUser(body: Usuario) {
+		const user = await prisma.usuario.create({
+			data: {
+				nome: body.nome,
+				email: body.email,
+				foto: body.foto,
+				senha: body.senha,
+				admin: body.admin
+			}
 		});
+		return user;
 	}
 	//Método para buscar um usuário pelo ID com suas músicas associadas
 	async getUserById(id: number) {
