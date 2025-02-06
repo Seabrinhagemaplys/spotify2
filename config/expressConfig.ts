@@ -3,6 +3,7 @@ import cors, { CorsOptions } from "cors";
 import dotenv from "dotenv";
 import UserRouter from "../src/domains/user/controllers/index";
 import ArtistRouter from "../src/domains/artists/controllers/index";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ const options: CorsOptions = {
 };
 
 app.use(cors(options));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({
 	extended: true

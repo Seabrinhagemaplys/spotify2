@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import userService from "../services/userServices";
+import { login, verifyJWT } from "../../../middlewares/auth";
 
 const router = Router();
 
@@ -12,7 +13,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) =>{
 	}
 });
 
-router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/:id", verifyJWT ,async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const { id } = req.params;
 		const user = await userService.getUserById(Number(id));
@@ -53,4 +54,5 @@ router.delete("/delete/:email", async (req: Request, res: Response, next: NextFu
 	}
 });
 
+router.post("/login", login);
 export default router;
