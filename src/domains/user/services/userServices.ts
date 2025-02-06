@@ -1,11 +1,24 @@
 import { PrismaClient } from "@prisma/client";
 import { Usuario } from "@prisma/client";
+import { QueryError } from "../../../../errors/errors/QueryError";
+import { InvalidParamError } from "../../../../errors/errors/InvalidParamError";
 const prisma = new PrismaClient();
 
 // Usuário Service
 class UserService {
 	// Método para criar um novo usuário
 	async createUser(body: Usuario) {
+		const checkUser = await prisma.usuario.findUnique({
+			where: {
+				email: body.email
+			}
+		});
+		if(checkUser) {
+			throw new QueryError("Esse email ja esta cadastrado!");
+		}
+		if(body.email == null) {
+			throw new InvalidParamError("Email nao informado!");
+		}
 		const user = await prisma.usuario.create({
 			data: {
 				nome: body.nome,
