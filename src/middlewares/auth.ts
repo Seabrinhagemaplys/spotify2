@@ -7,6 +7,7 @@ import statusCodes from "../../utils/constants/statusCodes";
 import { Usuario } from "@prisma/client";
 import { JwtPayload, sign, verify } from "jsonwebtoken";
 import { TokenError } from "../../errors/errors/TokenError";
+import { LoginError } from "../../errors/errors/LoginError";
 
 function generateJWT(user: Usuario, res: Response){
 	const body = {
@@ -76,16 +77,22 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
 }
 
 export async function notLoggedIn(req: Request, res: Response, next: NextFunction) {
+	console.log(req.user);
 	try {
-        
+		if(req.user && !req.user.admin) {
+			return next(new LoginError("Voce já está logado no sistema!")); 
+		}
+		req.body.admin = false;
+		next();
 	} catch (error) {
-        
+		next(error);
 	}
 }
 
 export function checkRole(req: Request, res: Response, next: NextFunction) {
 	const user = req.user;
-	if(user.admin == false){
+	console.log(req.user);
+	if(user && user.admin === false){
 		return next(new NotAuthorizedError("Acesso restrito a administradores!"));
 	}
 	next();

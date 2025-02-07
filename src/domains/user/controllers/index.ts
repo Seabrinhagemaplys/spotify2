@@ -1,32 +1,31 @@
 import { Router, Request, Response, NextFunction } from "express";
 import userService from "../services/userServices";
-import { login, verifyJWT } from "../../../middlewares/auth";
+import { checkRole, login, notLoggedIn, verifyJWT } from "../../../middlewares/auth";
 
 const router = Router();
 
-router.get("/", verifyJWT, async (req: Request, res: Response, next: NextFunction) =>{
+router.get("/", verifyJWT, checkRole, async (req: Request, res: Response, next: NextFunction) =>{
 	try {
-		const users = await userService.getAllUsers(req.user);
+		const users = await userService.getAllUsers();
 		res.json(users);
 	} catch(error){
 		next(error);
 	}
 });
 
-router.get("/:id", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+router.get("/:id", verifyJWT, checkRole, async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const { id } = req.params;
-		const user = await userService.getUserById(Number(id), req.user);
+		const user = await userService.getUserById(Number(id));
 		res.json(user);
 	} catch(error){
 		next(error);
 	}
 });
 
-router.post("/create", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+router.post("/create", verifyJWT, notLoggedIn, checkRole, async (req: Request, res: Response, next: NextFunction) => {
 	try{
-		console.log("req.user:", req.user);
-		const user = await userService.createUser(req.body, req.user);
+		const user = await userService.createUser(req.body);
 		res.json({ message: "Usuario criado com sucesso!", user: user});
 	} catch(error){
 		next(error);

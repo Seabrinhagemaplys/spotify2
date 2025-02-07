@@ -16,23 +16,20 @@ class UserService {
 		return encrypted;
 	}
 	// Método para criar um novo usuário
-	async createUser(body: Usuario, reqUser: Usuario) {
+	async createUser(body: Usuario) {
 		const checkUser = await prisma.usuario.findUnique({
 			where: {
 				email: body.email
 			}
 		});
-		if(body.nome == null || body.nome.trim() === "") {
+		if(!body.nome || body.nome.trim() === "") {
 			throw new InvalidParamError("Nome do usuario deve ser informado!");
 		}		
-		if(body.email == null) {
+		if(!body.email || body.email.trim() === "") {
 			throw new InvalidParamError("Email nao informado!");
 		}
 		if(body.senha == null || body.senha.length < 6) {
 			throw new InvalidParamError("Senha deve ter no minimo 6 caracteres!");
-		}
-		if(body.admin && reqUser.admin == false) {
-			throw new QueryError("Apenas administradores podem criar administradores!");
 		}
 		if(checkUser) {
 			throw new QueryError("Esse email ja esta cadastrado!");
@@ -50,10 +47,7 @@ class UserService {
 		return user;
 	}
 	//Método para buscar um usuário pelo ID com suas músicas associadas
-	async getUserById(id: number, reqUser: Usuario) {
-		if(reqUser.admin == false && reqUser.ID_Usuario !== id){
-			throw new NotAuthorizedError("Você deve ser um administrador para ver dados de outros usuarios!");
-		}
+	async getUserById(id: number) {
 		const user = await prisma.usuario.findUnique({
 			where: { ID_Usuario: id },
 			include: { musicas: true }, //musicas conectados ao usuario
@@ -64,10 +58,7 @@ class UserService {
 		return user;
 	}
 	//Método para buscar todos os usuários cadastrados
-	async getAllUsers(reqUser: Usuario) {
-		if(reqUser.admin == false){
-			throw new NotAuthorizedError("Ação restrita a administradores!");
-		}
+	async getAllUsers() {
 		return prisma.usuario.findMany();
 	}
 
@@ -82,10 +73,10 @@ class UserService {
 			if(body.ID_Usuario !== undefined) {
 				throw new NotAuthorizedError("Não é permitido alterar o ID do usuário!"); 
 			}
-			if(body.admin !== undefined && reqUser.admin == false){
+			if(body.admin !== undefined && reqUser.admin === false){
 				throw new NotAuthorizedError("Somente administradores podem alterar o cargo de um usuario!");
 			}
-			if(reqUser.admin == false && email !== reqUser.email){
+			if(reqUser.admin === false && email !== reqUser.email){
 				throw new NotAuthorizedError("Somente administradores podem alterar outros usuarios!");	
 			}
 			if(body.email && body.email.trim() === ""){
@@ -120,7 +111,7 @@ class UserService {
 			if(!userFound) {
 				throw new QueryError("Usuario nao encontrado!");
 			}
-			if(reqUser.admin == false && reqUser.email !== email) {
+			if(reqUser.admin === false && reqUser.email !== email) {
 				throw new NotAuthorizedError("Voce nao tem permissao para deletar outros usuarios!");
 			}
 			await prisma.usuario.delete({
