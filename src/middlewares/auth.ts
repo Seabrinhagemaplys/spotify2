@@ -10,9 +10,9 @@ import { TokenError } from "../../errors/errors/TokenError";
 function generateJWT(user: Usuario, res: Response){
 	const body = {
 		id: user.ID_Usuario,
+		nome: user.nome,
 		email: user.email,
 		admin: user.admin,
-		nome: user.nome
 	};
 	const token = sign({user: body}, process.env.SECRET_KEY || "", {expiresIn: Number(process.env.JWT_EXPIRATION)});
 	res.cookie("jwt", token, {
@@ -55,7 +55,7 @@ export async function login(req: Request, res: Response, next: NextFunction){
 		if(!user){
 			throw new PermissionError("Email e/ou senha incorretos!");
 		}
-		const match = compare(req.body.senha, user.senha);
+		const match = await compare(req.body.senha, user.senha);
 		if(!match){
 			throw new PermissionError("Email e/ou senha incorretos!");
 		}
@@ -82,4 +82,10 @@ export async function notLoggedIn(req: Request, res: Response, next: NextFunctio
 	}
 }
 
-export function checkRole()
+export function checkRole(req: Request, res: Response, next: NextFunction) {
+	const user = req.user;
+	if(user.admin == false){
+		return res.status(403).json({message: "Acesso restrito a administradores!"});
+	}
+	next();
+}

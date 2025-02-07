@@ -23,21 +23,21 @@ router.get("/:id", verifyJWT, async (req: Request, res: Response, next: NextFunc
 	}
 });
 
-router.post("/create", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/create", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try{
-		//const { nome, email, senha, admin, foto} = req.body;
-		const user = await userService.createUser(req.body);
+		console.log("req.user:", req.user);
+		const user = await userService.createUser(req.body, req.user);
 		res.json({ message: "Usuario criado com sucesso!", user: user});
 	} catch(error){
 		next(error);
 	}
 });
 
-router.put("/update/:email", async (req: Request, res: Response, next: NextFunction) => {
+router.put("/update/:email", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { email } = req.params;
 		const body = req.body;
-		const user = await userService.updateUser(email, body);
+		const user = await userService.updateUser(email, body, req.user);
 		res.json({ message: "Usuario atualizado com sucesso!", user: user});	
 	} catch (error) {
 		next(error);
@@ -47,7 +47,7 @@ router.put("/update/:email", async (req: Request, res: Response, next: NextFunct
 router.delete("/delete/:email", async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { email } = req.params;
-		await userService.deleteUser(email);
+		await userService.deleteUser(email, req.user);
 		res.json({ message: "Usuario deletado com sucesso!"});
 	} catch (error) {
 		next(error);

@@ -75,6 +75,12 @@ class UserService {
 			if(body.admin !== undefined && reqUser.admin == false){
 				throw new NotAuthorizedError("Somente administradores podem alterar o cargo de um usuario!");
 			}
+			if(reqUser.admin == false && email !== reqUser.email){
+				throw new NotAuthorizedError("Somente administradores podem alterar outros usuarios!");	
+			}
+			if(body.email && body.email.trim() === ""){
+				throw new InvalidParamError("Email deve ser informado!");
+			}
 			if(body.senha){
 				body.senha = await this.encryptPassword(body.senha); 
 			}
@@ -93,7 +99,7 @@ class UserService {
 			return updatedUser;
 		} catch (error) {
 			console.error("Erro ao atualizar os dados: ", error);
-			throw new Error("Não foi possível atualizar os dados.");
+			throw error;
 		}
 	}
 	async deleteUser(email: string, reqUser: Usuario) {
