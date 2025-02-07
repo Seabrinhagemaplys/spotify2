@@ -4,9 +4,9 @@ import { login, verifyJWT } from "../../../middlewares/auth";
 
 const router = Router();
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) =>{
+router.get("/", verifyJWT, async (req: Request, res: Response, next: NextFunction) =>{
 	try {
-		const users = await userService.getAllUsers();
+		const users = await userService.getAllUsers(req.user);
 		res.json(users);
 	} catch(error){
 		next(error);

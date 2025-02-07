@@ -64,7 +64,10 @@ class UserService {
 		return user;
 	}
 	//Método para buscar todos os usuários cadastrados
-	async getAllUsers() {
+	async getAllUsers(reqUser: Usuario) {
+		if(reqUser.admin == false){
+			throw new NotAuthorizedError("Ação restrita a administradores!");
+		}
 		return prisma.usuario.findMany();
 	}
 
