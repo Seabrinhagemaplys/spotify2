@@ -65,3 +65,4 @@ class MusicService {
 		}
 	}
 }
+export default new MusicService();
