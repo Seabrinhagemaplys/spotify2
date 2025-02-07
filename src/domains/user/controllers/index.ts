@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import userService from "../services/userServices";
-import { checkRole, login, notLoggedIn, verifyJWT } from "../../../middlewares/auth";
+import { checkRole, login, logout, verifyJWT } from "../../../middlewares/auth";
 
 const router = Router();
 
@@ -23,9 +23,9 @@ router.get("/:id", verifyJWT, checkRole, async (req: Request, res: Response, nex
 	}
 });
 
-router.post("/create", verifyJWT, notLoggedIn, checkRole, async (req: Request, res: Response, next: NextFunction) => {
+router.post("/create", async (req: Request, res: Response, next: NextFunction) => {
 	try{
-		const user = await userService.createUser(req.body);
+		const user = await userService.createUser(req.body, req.user);
 		res.json({ message: "Usuario criado com sucesso!", user: user});
 	} catch(error){
 		next(error);
@@ -54,5 +54,7 @@ router.delete("/delete/:email", verifyJWT, async (req: Request, res: Response, n
 });
 
 router.post("/login", login);
+
+router.post("/logout", verifyJWT, logout);
 
 export default router;

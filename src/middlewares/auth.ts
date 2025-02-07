@@ -70,24 +70,24 @@ export async function login(req: Request, res: Response, next: NextFunction){
 
 export async function logout(req: Request, res: Response, next: NextFunction) {
 	try {
-
+		res.clearCookie("jwt", {
+			httpOnly: true,
+			secure: process.env.NODE_ENV !== "development",
+		});
+		res.status(statusCodes.SUCCESS).json("Logout realizado com sucesso!");
 	} catch(error) {
 		next(error);
 	}
 }
 
 export async function notLoggedIn(req: Request, res: Response, next: NextFunction) {
-	console.log(req.user);
-	try {
-		if(req.user && !req.user.admin) {
-			return next(new LoginError("Voce já está logado no sistema!")); 
-		}
-		req.body.admin = false;
-		next();
-	} catch (error) {
-		next(error);
+	if(req.user && !req.user.admin) {
+		return next(new LoginError("Voce já está logado no sistema!")); 
 	}
+	req.body.admin = false;
+	next();
 }
+
 
 export function checkRole(req: Request, res: Response, next: NextFunction) {
 	const user = req.user;

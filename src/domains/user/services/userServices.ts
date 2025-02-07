@@ -16,12 +16,15 @@ class UserService {
 		return encrypted;
 	}
 	// Método para criar um novo usuário
-	async createUser(body: Usuario) {
+	async createUser(body: Usuario, reqUser: Usuario) {
 		const checkUser = await prisma.usuario.findUnique({
 			where: {
 				email: body.email
 			}
 		});
+		if(!reqUser && body.admin){
+			throw new NotAuthorizedError("Apenas administradores podem criar administradores!");
+		}
 		if(!body.nome || body.nome.trim() === "") {
 			throw new InvalidParamError("Nome do usuario deve ser informado!");
 		}		
@@ -34,6 +37,7 @@ class UserService {
 		if(checkUser) {
 			throw new QueryError("Esse email ja esta cadastrado!");
 		}
+
 		const encrypted = await this.encryptPassword(body.senha);		
 		const user = await prisma.usuario.create({
 			data: {
