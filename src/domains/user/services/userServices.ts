@@ -119,7 +119,7 @@ class UserService {
 			console.log("Usuário deletado com sucesso.");
 		} catch (error) {
 			console.error("Erro ao deletar usuário:", error);
-			throw new Error("Não foi possível deletar o usuário.");
+			throw error;
 		}
 	}
 }
