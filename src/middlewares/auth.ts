@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "../../config/prismaClient";
 import { PermissionError } from "../../errors/errors/PermissionError";
+import { NotAuthorizedError } from "../../errors/errors/NotAuthorizedError";
 import { compare } from "bcrypt";
 import statusCodes from "../../utils/constants/statusCodes";
 import { Usuario } from "@prisma/client";
@@ -85,7 +86,7 @@ export async function notLoggedIn(req: Request, res: Response, next: NextFunctio
 export function checkRole(req: Request, res: Response, next: NextFunction) {
 	const user = req.user;
 	if(user.admin == false){
-		return res.status(403).json({message: "Acesso restrito a administradores!"});
+		return next(new NotAuthorizedError("Acesso restrito a administradores!"));
 	}
 	next();
 }
