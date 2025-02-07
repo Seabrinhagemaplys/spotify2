@@ -3,7 +3,8 @@ import ArtistService  from "../services/artistsServices";
 
 const router = Router();
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+//Middlewares: verifyJWT (vê se o usuário está logado)
+router.get("/", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const artists = await ArtistService.getAllArtists();
 		res.json(artists);
@@ -12,7 +13,8 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
-router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
+//Middlewares: verifyJWT 
+router.get("/:id", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const artist = await ArtistService.getArtistById(Number(req.params.id));
 		res.json(artist);
@@ -21,7 +23,8 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
-router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+//Middlewares: verifyJWT e checkRole (verifica se o usuário é ADMIN ou não)
+router.post("/", verifyJWT, checkRole(), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const { nome, foto, numero_streams } = req.body;
 
@@ -32,7 +35,8 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
-router.put("/:id", async (req: Request, res: Response, next: NextFunction) =>{
+//Middlewares: verifyJWT e checkRole
+router.put("/:id", verifyJWT, checkRole(), async (req: Request, res: Response, next: NextFunction) =>{
 	try{
 		const { id } = req.params;
 		const body  = req.body;
@@ -44,7 +48,8 @@ router.put("/:id", async (req: Request, res: Response, next: NextFunction) =>{
 	}
 });
 
-router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
+//Middlewares: verifyJWT e checkRole
+router.delete("/:id", verifyJWT, checkRole(), async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const { id } = req.params;
 		const idArtist = Number(id);
