@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-class MusicService {
+class MusicServices {
 	// Método para criar uma nova música
 	async createMusic(
 		nome: string,
@@ -65,3 +65,4 @@ class MusicService {
 		}
 	}
 }
+export default new MusicServices();
