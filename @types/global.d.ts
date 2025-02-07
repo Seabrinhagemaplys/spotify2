@@ -13,7 +13,7 @@ declare global {
             PORT: number;
             DATABASE_URL: string;
             SECRET_KEY: string;
-            JWT_EXPIRATION: string;
+            JWT_EXPIRATION: number;
             NODE_ENV: string;
         }
     }
