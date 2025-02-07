@@ -3,6 +3,7 @@ import { Usuario } from "@prisma/client";
 import { QueryError } from "../../../../errors/errors/QueryError";
 import { InvalidParamError } from "../../../../errors/errors/InvalidParamError";
 import bcrypt from "bcrypt";
+import { NotAuthorizedError } from "../../../../errors/errors/NotAuthorizedError";
 
 const prisma = new PrismaClient();
 
@@ -15,7 +16,7 @@ class UserService {
 		return encrypted;
 	}
 	// Método para criar um novo usuário
-	async createUser(body: Usuario) {
+	async createUser(body: Usuario, reqUser: Usuario) {
 		const checkUser = await prisma.usuario.findUnique({
 			where: {
 				email: body.email
@@ -30,9 +31,9 @@ class UserService {
 		if(body.senha == null || body.senha.length < 6) {
 			throw new InvalidParamError("Senha deve ter no minimo 6 caracteres!");
 		}
-		// if(body.admin && !reqUser.admin) {
-		// 	throw new QueryError("Apenas administradores podem criar administradores!");
-		//}
+		if(body.admin && reqUser.admin == false) {
+			throw new QueryError("Apenas administradores podem criar administradores!");
+		}
 		if(checkUser) {
 			throw new QueryError("Esse email ja esta cadastrado!");
 		}
@@ -61,25 +62,22 @@ class UserService {
 	}
 
 	async updateUser(email: string, body: Partial<Usuario>, reqUser: Usuario) {
-		const userFound = await prisma.usuario.findUnique({
-			where: {
-				email
-			}
-		});
-		if(!userFound) {
-			throw new QueryError("Usuario nao encontrado!");
-		}
-
 		try {
-			// Verifica se o usuário existe
 			const userFound = await prisma.usuario.findUnique({
-				where: { email },
+				where: { email }
 			});
-
-			if (!userFound) {
-				throw new Error("Usuário não encontrado.");
+			if(!userFound) {
+				throw new QueryError("Usuario nao encontrado!");
 			}
-
+			if(body.ID_Usuario !== undefined) {
+				throw new NotAuthorizedError("Não é permitido alterar o ID do usuário!"); 
+			}
+			if(body.admin !== undefined && reqUser.admin == false){
+				throw new NotAuthorizedError("Somente administradores podem alterar o cargo de um usuario!");
+			}
+			if(body.senha){
+				body.senha = await this.encryptPassword(body.senha); 
+			}
 			const updatedUser = await prisma.usuario.update({
 				data: {
 					nome: body.nome,
@@ -92,7 +90,6 @@ class UserService {
 					email: email,
 				},
 			});
-
 			return updatedUser;
 		} catch (error) {
 			console.error("Erro ao atualizar os dados: ", error);
@@ -100,15 +97,16 @@ class UserService {
 		}
 	}
 	async deleteUser(email: string, reqUser: Usuario) {
-		const userFound = await prisma.usuario.findUnique({
-			where: {
-				email
-			}
-		});
-		if(!userFound) {
-			throw new QueryError("Usuario nao encontrado!");
-		}
 		try {
+			const userFound = await prisma.usuario.findUnique({
+				where: { email }
+			});
+			if(!userFound) {
+				throw new QueryError("Usuario nao encontrado!");
+			}
+			if(reqUser.admin == false && reqUser.email !== email) {
+				throw new NotAuthorizedError("Voce nao tem permissao para deletar outros usuarios!");
+			}
 			await prisma.usuario.delete({
 				where: { email },
 			});
@@ -119,4 +117,5 @@ class UserService {
 		}
 	}
 }
+
 export default new UserService();

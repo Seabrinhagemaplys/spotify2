@@ -62,6 +62,24 @@ export async function login(req: Request, res: Response, next: NextFunction){
 		generateJWT(user, res);
 		res.status(statusCodes.SUCCESS).json("Login realizado com sucesso!");
 	} catch(error) {
-
+		next(error);
 	}
 }
+
+export async function logout(req: Request, res: Response, next: NextFunction) {
+	try {
+
+	} catch(error) {
+		next(error);
+	}
+}
+
+export async function notLoggedIn(req: Request, res: Response, next: NextFunction) {
+	try {
+        
+	} catch (error) {
+        
+	}
+}
+
+export function checkRole()
