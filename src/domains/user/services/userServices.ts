@@ -50,11 +50,18 @@ class UserService {
 		return user;
 	}
 	//Método para buscar um usuário pelo ID com suas músicas associadas
-	async getUserById(id: number) {
-		return prisma.usuario.findUnique({
+	async getUserById(id: number, reqUser: Usuario) {
+		if(reqUser.admin == false && reqUser.ID_Usuario !== id){
+			throw new NotAuthorizedError("Você deve ser um administrador para ver dados de outros usuarios!");
+		}
+		const user = await prisma.usuario.findUnique({
 			where: { ID_Usuario: id },
 			include: { musicas: true }, //musicas conectados ao usuario
 		});
+		if(!user) {
+			throw new QueryError("Usuario nao encontrado!");
+		}
+		return user;
 	}
 	//Método para buscar todos os usuários cadastrados
 	async getAllUsers() {
