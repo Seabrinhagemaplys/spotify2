@@ -13,10 +13,9 @@ router.get("/", verifyJWT, checkRole, async (req: Request, res: Response, next: 
 	}
 });
 
-router.get("/:id", verifyJWT, checkRole, async (req: Request, res: Response, next: NextFunction) => {
+router.get("/account", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try{
-		const { id } = req.params;
-		const user = await userService.getUserById(Number(id));
+		const user = await userService.getUserById(Number(req.user.ID_Usuario));
 		res.json(user);
 	} catch(error){
 		next(error);
