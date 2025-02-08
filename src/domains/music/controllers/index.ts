@@ -1,19 +1,19 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { verifyJWT } from "../../../middlewares/auth";
-import statusCodes from "../../../../utils/constants/statusCodes";
+import { verifyJWT, checkRole } from "../../../middlewares/auth";
 import musicServices from "../services/musicServices";
+import { InvalidParamError } from "../../../../errors/errors/InvalidParamError";
+import { QueryError } from "../../../../errors/errors/QueryError";
 
 const router = Router();
 
-router.post("/", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+router.post("/", verifyJWT, checkRole, async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const music = await musicServices.createMusic(
-			req.body.nome,
-			req.body.genero,
-			req.body.ID_Artista,
-			req.body.album
-		);
-		res.status(statusCodes.CREATED).json(music);
+		const { nome, genero, ID_Artista, album } = req.body;
+		if (!nome || !genero || !ID_Artista) {
+			throw new InvalidParamError("Nome, gênero e ID do artista são obrigatórios!");
+		}
+		const music = await musicServices.createMusic(nome, genero, ID_Artista, album);
+		res.json(music);
 	} catch (error) {
 		next(error);
 	}
@@ -22,7 +22,7 @@ router.post("/", verifyJWT, async (req: Request, res: Response, next: NextFuncti
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const musicList = await musicServices.getAllMusic();
-		res.status(statusCodes.SUCCESS).json(musicList);
+		res.json(musicList);
 	} catch (error) {
 		next(error);
 	}
@@ -30,32 +30,45 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const music = await musicServices.getMusicById(Number(req.params.id));
-		if (!music) {
-			return res.status(statusCodes.NOT_FOUND).json({ message: "Música não encontrada" });
+		const id = Number(req.params.id);
+		if (isNaN(id)) {
+			throw new InvalidParamError("ID inválido!");
 		}
-		res.status(statusCodes.SUCCESS).json(music);
+		const music = await musicServices.getMusicById(id);
+		if (!music) {
+			throw new QueryError("Música não encontrada!");
+		}
+		res.json(music);
 	} catch (error) {
 		next(error);
 	}
 });
 
-router.put("/:id", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+router.put("/:id", verifyJWT, checkRole, async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const updatedMusic = await musicServices.updateMusica(Number(req.params.id), req.body);
-		res.status(statusCodes.SUCCESS).json(updatedMusic);
+		const id = Number(req.params.id);
+		if (isNaN(id)) {
+			throw new InvalidParamError("ID inválido!");
+		}
+		const updatedMusic = await musicServices.updateMusica(id, req.body);
+		res.json(updatedMusic);
 	} catch (error) {
 		next(error);
 	}
 });
 
-router.delete("/:id", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/:id", verifyJWT, checkRole, async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await musicServices.deleteMusica(Number(req.params.id));
-		res.status(statusCodes.NO_CONTENT).send();
+		const id = Number(req.params.id);
+		if (isNaN(id)) {
+			throw new InvalidParamError("ID inválido!");
+		}
+		await musicServices.deleteMusica(id);
+		res.send();
 	} catch (error) {
 		next(error);
 	}
 });
 
 export default router;
+
