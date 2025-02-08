@@ -80,9 +80,6 @@ class UserService {
 			if(body.admin !== undefined && reqUser.admin === false){
 				throw new NotAuthorizedError("Somente administradores podem alterar o cargo de um usuario!");
 			}
-			if(reqUser.admin === false && email !== reqUser.email){
-				throw new NotAuthorizedError("Somente administradores podem alterar outros usuarios!");	
-			}
 			if(body.email && body.email.trim() === ""){
 				throw new InvalidParamError("Email deve ser informado!");
 			}
