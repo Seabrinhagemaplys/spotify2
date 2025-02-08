@@ -55,7 +55,11 @@ class ArtistService {
 	async getAllArtists() {
 
 		try{
-			return await prisma.artista.findMany();
+			return await prisma.artista.findMany({
+				orderBy: {
+					nome: "asc", // Ordena em ordem alfabética crescente (A-Z)
+				},
+			});
 		} catch(error){
 			console.error("Erro ao buscar os artistas", error);
 			throw new Error("Não foi possível buscar os artistas!");
