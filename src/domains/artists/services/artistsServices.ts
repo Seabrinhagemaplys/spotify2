@@ -45,6 +45,8 @@ class ArtistService {
 			if (!artista) {
 				throw new QueryError("Artista não encontrado!");
 			}
+
+			return artista;
 		} catch (error) {
 			console.error("Erro ao buscar o artista", error);
 			throw new Error("Não foi possível achar o artista!");
