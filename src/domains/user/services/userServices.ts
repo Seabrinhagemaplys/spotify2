@@ -22,7 +22,7 @@ class UserService {
 				email: body.email
 			}
 		});
-		if(!reqUser && body.admin){
+		if(!reqUser.admin && body.admin){
 			throw new NotAuthorizedError("Apenas administradores podem criar administradores!");
 		}
 		if(!body.nome || body.nome.trim() === "") {
@@ -104,19 +104,16 @@ class UserService {
 			throw error;
 		}
 	}
-	async deleteUser(email: string, reqUser: Usuario) {
+	async deleteUser(id: number) {
 		try {
 			const userFound = await prisma.usuario.findUnique({
-				where: { email }
+				where: { ID_Usuario: id }
 			});
 			if(!userFound) {
 				throw new QueryError("Usuario nao encontrado!");
 			}
-			if(reqUser.admin === false && reqUser.email !== email) {
-				throw new NotAuthorizedError("Voce nao tem permissao para deletar outros usuarios!");
-			}
 			await prisma.usuario.delete({
-				where: { email },
+				where: { ID_Usuario: id },
 			});
 			console.log("Usuário deletado com sucesso.");
 		} catch (error) {

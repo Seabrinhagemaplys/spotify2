@@ -22,7 +22,7 @@ router.get("/account", verifyJWT, async (req: Request, res: Response, next: Next
 	}
 });
 
-router.post("/create", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/create", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.createUser(req.body, req.user);
 		res.json({ message: "Usuario criado com sucesso!", user: user});
@@ -42,10 +42,19 @@ router.put("/account/update", verifyJWT, async (req: Request, res: Response, nex
 	}
 });
 
-router.delete("/delete/:email", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/account/delete", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { email } = req.params;
-		await userService.deleteUser(email, req.user);
+		await userService.deleteUser(Number(req.params.ID_Usuario));
+		res.json({ message: "Usuario deletado com sucesso!"});
+	} catch (error) {
+		next(error);
+	}
+});
+
+router.delete("/delete/:id", verifyJWT, checkRole, async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		console.log(Number(req.params.id));
+		await userService.deleteUser(Number(req.params.id));
 		res.json({ message: "Usuario deletado com sucesso!"});
 	} catch (error) {
 		next(error);
