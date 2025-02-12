@@ -31,6 +31,15 @@ router.post("/create", verifyJWT, async (req: Request, res: Response, next: Next
 	}
 });
 
+router.post("/admin/create", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+	try{
+		const user = await userService.createUser(req.body, req.user);
+		res.json({ message: "Usuario criado com sucesso!", user: user});
+	} catch(error){
+		next(error);
+	}
+})
+
 router.put("/account/update", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const  email  = req.user.email;
@@ -41,6 +50,7 @@ router.put("/account/update", verifyJWT, async (req: Request, res: Response, nex
 		next(error);
 	}
 });
+
 
 router.delete("/account/delete", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try {
