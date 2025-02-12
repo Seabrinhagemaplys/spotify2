@@ -66,10 +66,10 @@ class UserService {
 		return prisma.usuario.findMany();
 	}
 
-	async updateUser(email: string, body: Partial<Usuario>, reqUser: Usuario) {
+	async updateUser(id: number, body: Partial<Usuario>, reqUser: Usuario) {
 		try {
 			const userFound = await prisma.usuario.findUnique({
-				where: { email }
+				where: { ID_Usuario: id }
 			});
 			if(!userFound) {
 				throw new QueryError("Usuario nao encontrado!");
@@ -95,7 +95,7 @@ class UserService {
 					admin: body.admin,
 				},
 				where: {
-					email: email,
+					ID_Usuario: id,
 				},
 			});
 			return updatedUser;

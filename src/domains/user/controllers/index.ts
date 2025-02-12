@@ -42,15 +42,24 @@ router.post("/admin/create", verifyJWT, async (req: Request, res: Response, next
 
 router.put("/account/update", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const  email  = req.user.email;
+		const id = req.user.ID_Usuario;
 		const body = req.body;
-		const user = await userService.updateUser(email, body, req.user);
+		const user = await userService.updateUser(id, body, req.user);
 		res.json({ message: "Usuario atualizado com sucesso!", user: user});	
 	} catch (error) {
 		next(error);
 	}
 });
 
+router.post("/update/:id", verifyJWT, checkRole, async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const body = req.body;
+		const user = await userService.updateUser(Number(req.params.id), body, req.user);
+		res.json({ message: "Usuario atualizado com sucesso!", user: user});	
+	} catch (error) {
+		next(error);
+	}
+});
 
 router.delete("/account/delete", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
 	try {
