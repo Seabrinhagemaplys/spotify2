@@ -63,7 +63,6 @@ router.delete("/account/delete", verifyJWT, async (req: Request, res: Response, 
 
 router.delete("/delete/:id", verifyJWT, checkRole, async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		console.log(Number(req.params.id));
 		await userService.deleteUser(Number(req.params.id));
 		res.json({ message: "Usuario deletado com sucesso!"});
 	} catch (error) {

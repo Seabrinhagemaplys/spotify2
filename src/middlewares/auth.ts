@@ -91,7 +91,6 @@ export async function notLoggedIn(req: Request, res: Response, next: NextFunctio
 
 export function checkRole(req: Request, res: Response, next: NextFunction) {
 	const user = req.user;
-	console.log(req.user);
 	if(user && user.admin === false){
 		return next(new NotAuthorizedError("Acesso restrito a administradores!"));
 	}
