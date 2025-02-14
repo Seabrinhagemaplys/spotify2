@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { Musica } from "@prisma/client";
 import { QueryError } from "../../../../errors/errors/QueryError";
 import { InvalidParamError } from "../../../../errors/errors/InvalidParamError";
 
@@ -50,7 +51,7 @@ class MusicServices {
         }
     }
 
-	async updateMusica(id: number, body: any) {
+	async updateMusica(id: number, body: Partial<Musica>) {
 		try {
 			const musicaFound = await prisma.musica.findUnique({
 				where: { ID_Musica: id },
