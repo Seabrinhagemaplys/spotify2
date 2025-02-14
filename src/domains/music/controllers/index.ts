@@ -31,9 +31,9 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const id = Number(req.params.id);
-		if (isNaN(id)) {
+		if (!id || isNaN(id)) {
 			throw new InvalidParamError("ID inválido!");
-		}
+		  }		  
 		const music = await musicServices.getMusicById(id);
 		if (!music) {
 			throw new QueryError("Música não encontrada!");
@@ -47,9 +47,9 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 router.put("/:id", verifyJWT, checkRole, async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const id = Number(req.params.id);
-		if (isNaN(id)) {
+		if (!id || isNaN(id)) {
 			throw new InvalidParamError("ID inválido!");
-		}
+		  }		  
 		const updatedMusic = await musicServices.updateMusica(id, req.body);
 		res.json(updatedMusic);
 	} catch (error) {
@@ -60,9 +60,9 @@ router.put("/:id", verifyJWT, checkRole, async (req: Request, res: Response, nex
 router.delete("/:id", verifyJWT, checkRole, async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const id = Number(req.params.id);
-		if (isNaN(id)) {
+		if (!id || isNaN(id)) {
 			throw new InvalidParamError("ID inválido!");
-		}
+		  }		  
 		await musicServices.deleteMusica(id);
 		res.send();
 	} catch (error) {
@@ -71,4 +71,3 @@ router.delete("/:id", verifyJWT, checkRole, async (req: Request, res: Response, 
 });
 
 export default router;
-
