@@ -239,3 +239,23 @@ describe('updateUser', () => {
         })).rejects.toThrow(QueryError);
     });
 });
+
+describe('deleteUser', () => {
+    test('should delete user successfully', async () => {
+        const user = {
+            ID_Usuario: 1,
+            nome: 'User',
+            email: 'user@test.com',
+            senha: 'user123',
+            foto: null,
+            admin: false,
+        };
+        prismaMock.usuario.findUnique.mockResolvedValue(user);
+        prismaMock.usuario.delete.mockResolvedValue(user);
+        await expect(userServices.deleteUser(1)).resolves.toBeUndefined();
+    });
+    test('should throw error if user not found', async () => {
+        prismaMock.usuario.findUnique.mockResolvedValue(null);
+        await expect(userServices.deleteUser(435)).rejects.toThrow(QueryError);
+    });
+});
