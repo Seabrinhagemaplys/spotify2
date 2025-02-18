@@ -136,3 +136,24 @@ describe('getUserById', () => {
         await expect(userServices.getUserById(123)).rejects.toThrow(QueryError);
     });
 });
+
+describe('getAllUsers', () => {
+    test('should retrieve all users', async () => {
+        const users = [{
+            ID_Usuario: 1,
+            nome: 'user teste',
+            email: 'user@test.com',
+            senha: 'teste123',
+            foto: null,
+            admin: false,
+        }];
+        prismaMock.usuario.findMany.mockResolvedValue(users);
+        await expect(userServices.getAllUsers()).resolves.toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    email: 'user@test.com' 
+                }),
+            ])
+        );
+    });
+});
