@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../../../config/prismaClient";
 import { Usuario } from "@prisma/client";
 import { QueryError } from "../../../../errors/errors/QueryError";
 import { InvalidParamError } from "../../../../errors/errors/InvalidParamError";
 import bcrypt from "bcrypt";
 import { NotAuthorizedError } from "../../../../errors/errors/NotAuthorizedError";
-
-const prisma = new PrismaClient();
 
 
 // Usuário Service
