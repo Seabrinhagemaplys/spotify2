@@ -71,4 +71,3 @@ router.delete("/:id", verifyJWT, checkRole, async (req: Request, res: Response, 
 });
 
 export default router;
-

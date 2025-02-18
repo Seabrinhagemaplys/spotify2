@@ -16,11 +16,9 @@ function generateJWT(user: Usuario, res: Response){
 		email: user.email,
 		admin: user.admin,
 	};
-	const token = sign({user: body}, process.env.SECRET_KEY || "", {expiresIn: Number(process.env.JWT_EXPIRATION)});
-	res.cookie("jwt", token, {
-		httpOnly: true,
-		secure: process.env.NODE_ENV !== "development"
-	});
+	const token = sign({ user: body }, process.env.SECRET_KEY || "", {
+		expiresIn: process.env.JWT_EXPIRATION,
+	  });
 }
 
 function cookieExtractor(req: Request){
