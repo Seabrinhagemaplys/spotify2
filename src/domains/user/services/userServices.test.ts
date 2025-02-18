@@ -112,3 +112,27 @@ describe('createUser', () => {
     });
 });
 
+describe('getUserById', () => {
+    test('should retrieve a user by ID', async () => {
+        const user = {
+            ID_Usuario: 1,
+            nome: 'user teste',
+            email: 'user@test.com',
+            senha: 'senha123',
+            foto: null,
+            admin: false,
+            musicas: [],
+        };
+        prismaMock.usuario.findUnique.mockResolvedValue(user);
+        await expect(userServices.getUserById(1)).resolves.toEqual(
+            expect.objectContaining({
+                ID_Usuario: 1,
+                email: 'user@test.com',
+            })
+        );
+    });
+    test('should return an error if user cant be found by ID', async () => {
+        prismaMock.usuario.findUnique.mockResolvedValue(null);
+        await expect(userServices.getUserById(123)).rejects.toThrow(QueryError);
+    });
+});
