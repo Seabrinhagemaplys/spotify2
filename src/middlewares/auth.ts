@@ -79,10 +79,9 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
 }
 
 export async function notLoggedIn(req: Request, res: Response, next: NextFunction) {
-	if(req.user && !req.user.admin) {
+	if(req.user) {
 		return next(new LoginError("Voce já está logado no sistema!")); 
 	}
-	req.body.admin = false;
 	next();
 }
 

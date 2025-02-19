@@ -22,7 +22,7 @@ router.get("/account", verifyJWT, async (req: Request, res: Response, next: Next
 	}
 });
 
-router.post("/create", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+router.post("/create", async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.createUser(req.body, req.user);
 		res.json({ message: "Usuario criado com sucesso!", user: user});

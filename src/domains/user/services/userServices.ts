@@ -14,13 +14,13 @@ class UserService {
 		return encrypted;
 	}
 	// Método para criar um novo usuário
-	async createUser(body: Usuario, reqUser: Usuario) {
+	async createUser(body: Usuario, reqUser: Usuario | null) {
 		const checkUser = await prisma.usuario.findUnique({
 			where: {
 				email: body.email
 			}
 		});
-		if(!reqUser.admin && body.admin){
+		if(!reqUser && body.admin){
 			throw new NotAuthorizedError("Apenas administradores podem criar administradores!");
 		}
 		if(!body.nome || body.nome.trim() === "") {
