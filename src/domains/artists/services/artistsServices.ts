@@ -1,9 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../../../config/prismaClient";
 import { Artista } from "@prisma/client";
 import { InvalidParamError } from "../../../../errors/errors/InvalidParamError";
 import { QueryError } from "../../../../errors/errors/QueryError";
-
-const prisma = new PrismaClient();
 
 //ToDo: Tratamento de Erros (adicionar os res.status em artists/index.ts)
 
@@ -25,6 +23,9 @@ class ArtistService {
 
 		} catch (error) {
 			console.error("Erro ao criar o artista:", error);
+			if (error instanceof QueryError || error instanceof InvalidParamError) {
+				throw error;
+			}
 			throw new Error("Não foi possível criar o artista!");
 		}
 	}
@@ -49,6 +50,9 @@ class ArtistService {
 			return artista;
 		} catch (error) {
 			console.error("Erro ao buscar o artista", error);
+			if (error instanceof QueryError || error instanceof InvalidParamError) {
+				throw error;
+			}
 			throw new Error("Não foi possível achar o artista!");
 		}
 	}
@@ -64,6 +68,9 @@ class ArtistService {
 			});
 		} catch(error){
 			console.error("Erro ao buscar os artistas", error);
+			if (error instanceof QueryError || error instanceof InvalidParamError) {
+				throw error;
+			}
 			throw new Error("Não foi possível buscar os artistas!");
 		}
 	}
@@ -99,6 +106,9 @@ class ArtistService {
 			return updatedArtista;
 		} catch (error) {
 			console.error("Erro ao atualizar artista: ", error);
+			if (error instanceof QueryError || error instanceof InvalidParamError) {
+				throw error;
+			}
 			throw new Error("Não foi possível atualizar o artista.");
 		}
 	}
@@ -126,6 +136,9 @@ class ArtistService {
 			console.log("Artista deletado com sucesso.");
 		} catch (error) {
 			console.error("Erro ao deletar artista:", error);
+			if (error instanceof QueryError || error instanceof InvalidParamError) {
+				throw error;
+			}
 			throw new Error("Não foi possível deletar o artista.");
 		}
 	}
