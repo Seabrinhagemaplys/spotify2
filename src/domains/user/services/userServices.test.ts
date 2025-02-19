@@ -157,3 +157,105 @@ describe('getAllUsers', () => {
         );
     });
 });
+
+describe('updateUser', () => {
+    test('should update user successfully', async () => {
+        const user = {
+            ID_Usuario: 1,
+            nome: 'Will B. Updated',
+            email: 'user@update.com',
+            senha: 'senha123',
+            foto: null,
+            admin: false,
+        };
+        const updatedUser = {
+            ...user,
+            nome: 'Updated',
+        };
+        prismaMock.usuario.findUnique.mockResolvedValue(user);
+        prismaMock.usuario.update.mockResolvedValue(updatedUser);
+        await expect(userServices.updateUser(1, { nome: 'Updated'},
+            {
+                ID_Usuario: 999,
+                nome: 'admin',
+                email: 'admin@update.com',
+                senha: 'senha123',
+                foto: null,
+                admin: true,
+            }
+        )).resolves.toEqual(expect.objectContaining({
+            nome: 'Updated'
+        }));
+    });
+    test('should not allow changing user ID', async () => {
+        const user = {
+            ID_Usuario: 1,
+            nome: 'user',
+            email: 'user@test.com',
+            senha: 'senha123',
+            foto: null,
+            admin: false,
+        };
+        prismaMock.usuario.findUnique.mockResolvedValue(user);
+        await expect(userServices.updateUser(1, {
+            ID_Usuario: 99
+        }, {
+            ID_Usuario: 1,
+            nome: 'user',
+            email: 'user@test.com',
+            senha: 'senha123',
+            foto: null,
+            admin: false,
+        })).rejects.toThrow(NotAuthorizedError);
+    });
+    test('should not allow non-admin to change admin status', async () => {
+        const user = {
+            ID_Usuario: 1,
+            nome: 'user',
+            email: 'user@test.com',
+            senha: 'senha123',
+            foto: null,
+            admin: false,
+        }
+        prismaMock.usuario.findUnique.mockResolvedValue(user);
+        await expect(userServices.updateUser(1, { admin: true }, {
+            ID_Usuario: 1,
+            nome: 'user',
+            email: 'user@test.com',
+            senha: 'senha123',
+            foto: null,
+            admin: false,
+        })).rejects.toThrow(NotAuthorizedError);
+    });
+    test('should throw error if user not found', async () => {
+        prismaMock.usuario.findUnique.mockResolvedValue(null);
+        await expect(userServices.updateUser(212, { nome: 'not found'}, {
+            ID_Usuario: 999,
+            nome: 'admin',
+            email: 'admin@test.com',
+            senha: 'admin123',
+            foto: null,
+            admin: true,
+        })).rejects.toThrow(QueryError);
+    });
+});
+
+describe('deleteUser', () => {
+    test('should delete user successfully', async () => {
+        const user = {
+            ID_Usuario: 1,
+            nome: 'User',
+            email: 'user@test.com',
+            senha: 'user123',
+            foto: null,
+            admin: false,
+        };
+        prismaMock.usuario.findUnique.mockResolvedValue(user);
+        prismaMock.usuario.delete.mockResolvedValue(user);
+        await expect(userServices.deleteUser(1)).resolves.toBeUndefined();
+    });
+    test('should throw error if user not found', async () => {
+        prismaMock.usuario.findUnique.mockResolvedValue(null);
+        await expect(userServices.deleteUser(435)).rejects.toThrow(QueryError);
+    });
+});
