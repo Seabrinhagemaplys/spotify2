@@ -19,6 +19,10 @@ function generateJWT(user: Usuario, res: Response){
 	const token = sign({ user: body }, process.env.SECRET_KEY || "", {
 		expiresIn: process.env.JWT_EXPIRATION,
 	  });
+	res.cookie("jwt", token, {
+		httpOnly: true,
+		secure: process.env.NODE_ENV !== "development"
+	});
 }
 
 function cookieExtractor(req: Request){
@@ -32,11 +36,13 @@ function cookieExtractor(req: Request){
 export function verifyJWT(req: Request, res: Response, next: NextFunction){
 	try {
 		const token = cookieExtractor(req);
+		console.log(token);
 		if(token){
 			const decoded = verify(token, process.env.SECRET_KEY || "") as JwtPayload;
 			req.user = decoded.user;
 		}
 		if(req.user == null){
+			console.log(req.user);
 			throw new TokenError("Voce precisa estar logado para realizar essa açao!");
 		}
 		next();
