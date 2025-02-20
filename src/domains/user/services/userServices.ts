@@ -20,23 +20,23 @@ class UserService {
 				email: body.email
 			}
 		});
-		if(!reqUser && body.admin){
+		if (!reqUser && body.admin) {
 			throw new NotAuthorizedError("Apenas administradores podem criar administradores!");
 		}
-		if(!body.nome || body.nome.trim() === "") {
+		if (!body.nome || body.nome.trim() === "") {
 			throw new InvalidParamError("Nome do usuario deve ser informado!");
-		}		
-		if(!body.email || body.email.trim() === "") {
+		}
+		if (!body.email || body.email.trim() === "") {
 			throw new InvalidParamError("Email nao informado!");
 		}
-		if(body.senha == null || body.senha.length < 6) {
+		if (body.senha == null || body.senha.length < 6) {
 			throw new InvalidParamError("Senha deve ter no minimo 6 caracteres!");
 		}
-		if(checkUser) {
+		if (checkUser) {
 			throw new QueryError("Esse email ja esta cadastrado!");
 		}
 
-		const encrypted = await this.encryptPassword(body.senha);		
+		const encrypted = await this.encryptPassword(body.senha);
 		const user = await prisma.usuario.create({
 			data: {
 				nome: body.nome,
@@ -52,12 +52,26 @@ class UserService {
 	async getUserById(id: number) {
 		const user = await prisma.usuario.findUnique({
 			where: { ID_Usuario: id },
-			include: { musicas: true }, //musicas conectados ao usuario
+			include: {
+				musicas: {
+					include: {
+						musica: {
+							select: {
+								nome: true,
+							}
+						}
+					}
+				}
+			}
 		});
-		if(!user) {
+		if (!user) {
 			throw new QueryError("Usuario nao encontrado!");
 		}
-		return user;
+		const formattedUser = {
+			...user,
+			musicas: user.musicas.map((um) => um.musica.nome),
+		}
+		return formattedUser;
 	}
 	//Método para buscar todos os usuários cadastrados
 	async getAllUsers() {
@@ -69,20 +83,20 @@ class UserService {
 			const userFound = await prisma.usuario.findUnique({
 				where: { ID_Usuario: id }
 			});
-			if(!userFound) {
+			if (!userFound) {
 				throw new QueryError("Usuario nao encontrado!");
 			}
-			if(body.ID_Usuario !== undefined) {
-				throw new NotAuthorizedError("Não é permitido alterar o ID do usuário!"); 
+			if (body.ID_Usuario !== undefined) {
+				throw new NotAuthorizedError("Não é permitido alterar o ID do usuário!");
 			}
-			if(body.admin !== undefined && reqUser.admin === false){
+			if (body.admin !== undefined && reqUser.admin === false) {
 				throw new NotAuthorizedError("Somente administradores podem alterar o cargo de um usuario!");
 			}
-			if(body.email && body.email.trim() === ""){
+			if (body.email && body.email.trim() === "") {
 				throw new InvalidParamError("Email deve ser informado!");
 			}
-			if(body.senha){
-				body.senha = await this.encryptPassword(body.senha); 
+			if (body.senha) {
+				body.senha = await this.encryptPassword(body.senha);
 			}
 			const updatedUser = await prisma.usuario.update({
 				data: {
@@ -107,7 +121,7 @@ class UserService {
 			const userFound = await prisma.usuario.findUnique({
 				where: { ID_Usuario: id }
 			});
-			if(!userFound) {
+			if (!userFound) {
 				throw new QueryError("Usuario nao encontrado!");
 			}
 			await prisma.usuario.delete({
@@ -119,13 +133,13 @@ class UserService {
 			throw error;
 		}
 	}
-	async linkMusicToUser(userId: number, musicId: number){
+	async linkMusicToUser(userId: number, musicId: number) {
 		const music = await prisma.musica.findUnique({
-			where: { 
+			where: {
 				ID_Musica: musicId
 			},
 		});
-		if(!music) {
+		if (!music) {
 			throw new QueryError("Musica nao encontrada!");
 		}
 		return await prisma.usuarios_Musicas.create({
