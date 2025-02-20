@@ -22,6 +22,17 @@ router.get("/account", verifyJWT, async (req: Request, res: Response, next: Next
 	}
 });
 
+router.post("/account/musics", verifyJWT, async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const userId = req.user.ID_Usuario;
+		const { musicId } = req.body;
+		const userMusic = await userService.linkMusicToUser(userId, musicId);
+		res.json({ message: "Musica adicionada com sucesso!", userMusic});
+	} catch (error) {
+		next(error);
+	}
+});
+
 router.post("/create", async (req: Request, res: Response, next: NextFunction) => {
 	try{
 		const user = await userService.createUser(req.body, req.user);

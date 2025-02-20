@@ -119,6 +119,22 @@ class UserService {
 			throw error;
 		}
 	}
+	async linkMusicToUser(userId: number, musicId: number){
+		const music = await prisma.musica.findUnique({
+			where: { 
+				ID_Musica: musicId
+			},
+		});
+		if(!music) {
+			throw new QueryError("Musica nao encontrada!");
+		}
+		return await prisma.usuarios_Musicas.create({
+			data: {
+				ID_Usuario: userId,
+				ID_Musica: musicId,
+			},
+		});
+	}
 }
 
 export default new UserService();
